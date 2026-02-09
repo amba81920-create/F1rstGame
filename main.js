@@ -1,0 +1,64 @@
+import {initEngine,scene,camera,renderer} from "./engine.js";
+import {Player} from "./player.js";
+import {Enemy} from "./enemy.js";
+import {shoot} from "./gun.js";
+import {createUI} from "./ui.js";
+
+initEngine();
+
+//////////////////////////////////////////////////
+// LIGHT
+//////////////////////////////////////////////////
+
+scene.add(new THREE.HemisphereLight(0xffffff,0x444444,1.3));
+
+//////////////////////////////////////////////////
+// FLOOR
+//////////////////////////////////////////////////
+
+const floor=new THREE.Mesh(
+ new THREE.PlaneGeometry(200,200),
+ new THREE.MeshLambertMaterial({color:0x2b2b2b})
+);
+floor.rotation.x=-Math.PI/2;
+scene.add(floor);
+
+//////////////////////////////////////////////////
+// PLAYER
+//////////////////////////////////////////////////
+
+const player=new Player(scene,camera);
+
+//////////////////////////////////////////////////
+// ENEMIES
+//////////////////////////////////////////////////
+
+const enemies=[];
+
+for(let i=0;i<8;i++){
+ enemies.push(
+  new Enemy(scene,Math.random()*80-40,Math.random()*80-40)
+ );
+}
+
+//////////////////////////////////////////////////
+// UI
+//////////////////////////////////////////////////
+
+createUI(()=>shoot(camera,enemies,scene));
+
+//////////////////////////////////////////////////
+// LOOP
+//////////////////////////////////////////////////
+
+function animate(){
+ requestAnimationFrame(animate);
+
+ player.update();
+
+ enemies.forEach(e=>e.update(player.obj.position));
+
+ renderer.render(scene,camera);
+}
+
+animate();
